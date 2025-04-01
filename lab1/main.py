@@ -2,39 +2,93 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
+import numpy as np
+import matplotlib.pyplot as plt
 
 def find_pictures():
-    folder_path = '/Users/wojtek/repos/LabyCpsio/lab1/obrazy'
     return [f for f in os.listdir(folder_path) 
             if os.path.isfile(os.path.join(folder_path, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp','.tif'))]
 
-def show_image():
+def load_image():
+    global current_image_np
     selected_file = dropdown.get()
     if not selected_file:
         return
     full_path = os.path.join(folder_path, selected_file)
-    image = Image.open(full_path)
-    image = image.resize((400, 400))  # skalowanie do rozmiaru okna
-    photo = ImageTk.PhotoImage(image)
+    image = Image.open(full_path).convert('L')
+    current_image_np = np.array(image)
+    image_resized = image.resize((400, 400))
+    photo = ImageTk.PhotoImage(image_resized)
     label_image.config(image=photo)
-    label_image.image = photo  # zachowaj referencję
+    label_image.image = photo
 
-if __name__ == "__main__":
-    folder_path = '/Users/wojtek/repos/LabyCpsio/lab1/obrazy'
-    pictures = find_pictures()
+def show_profile(orientation):
+    if current_image_np is None:
+        return
+    try:
+        index = int(entry_coord.get())
+        if orientation == 'horizontal':
+            line = current_image_np[index, :]
+            title = f'Profil poziomy (wiersz {index})'
+        else:
+            line = current_image_np[:, index]
+            title = f'Profil pionowy (kolumna {index})'
+        plt.figure()
+        plt.plot(line)
+        plt.title(title)
+        plt.xlabel("Pozycja")
+        plt.ylabel("Poziom szarości")
+        plt.grid(True)
+        plt.show()
+    except Exception as e:
+        print("Błąd:", e)
 
-    root = tk.Tk()
-    root.title("Wybór obrazu")
+def save_crop():
+    if current_image_np is None:
+        return
+    try:
+        raw = entry_crop.get().strip()
+        x, y, w, h, filename = raw.split(',')
+        x, y, w, h = int(x), int(y), int(w), int(h)
+        cropped = current_image_np[y:y+h, x:x+w]
+        Image.fromarray(cropped).save(os.path.join(folder_path, filename))
+        print(f"Zapisano podobszar jako: {filename}")
+    except Exception as e:
+        print("Błąd przy zapisie podobszaru:", e)
 
-    ttk.Label(root, text="Wybierz obraz:").pack(pady=5)
+# Ścieżka do katalogu z obrazami
+folder_path = '/Users/wojtek/repos/LabyCpsio/lab1/obrazy'
+current_image_np = None
 
-    dropdown = ttk.Combobox(root, values=pictures, state="readonly")
-    dropdown.pack(pady=5)
+root = tk.Tk()
+root.title("Wybór obrazu, profil szarości i zapis podobszaru")
 
-    btn_show = ttk.Button(root, text="Pokaż obraz", command=show_image)
-    btn_show.pack(pady=5)
+# Wybór obrazu
+ttk.Label(root, text="Wybierz obraz:").pack(pady=5)
+dropdown = ttk.Combobox(root, values=find_pictures(), state="readonly")
+dropdown.pack(pady=5)
 
-    label_image = ttk.Label(root)
-    label_image.pack(pady=10)
+btn_load = ttk.Button(root, text="Pokaż obraz", command=load_image)
+btn_load.pack(pady=5)
 
-    root.mainloop()
+label_image = ttk.Label(root)
+label_image.pack(pady=10)
+
+# Profil szarości
+ttk.Label(root, text="Wpisz współrzędną linii (wiersz/kolumna):").pack(pady=5)
+entry_coord = ttk.Entry(root)
+entry_coord.insert(0, "100")
+entry_coord.pack(pady=5)
+
+ttk.Button(root, text="Profil poziomy", command=lambda: show_profile('horizontal')).pack(pady=2)
+ttk.Button(root, text="Profil pionowy", command=lambda: show_profile('vertical')).pack(pady=2)
+
+# Podobraz
+ttk.Label(root, text="x,y,szer,wys,nazwa_pliku").pack(pady=10)
+entry_crop = ttk.Entry(root)
+entry_crop.insert(0, "50,50,100,100,podobraz.png")
+entry_crop.pack(pady=5)
+
+ttk.Button(root, text="Zapisz podobszar", command=save_crop).pack(pady=5)
+
+root.mainloop()
