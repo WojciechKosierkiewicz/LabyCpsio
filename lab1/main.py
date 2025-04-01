@@ -17,6 +17,10 @@ def load_image():
     full_path = os.path.join(folder_path, selected_file)
     image = Image.open(full_path).convert('L')
     current_image_np = np.array(image)
+
+    w, h = image.size
+    label_size.config(text=f"Rozmiar: {w} × {h} px")
+
     image_resized = image.resize((400, 400))
     photo = ImageTk.PhotoImage(image_resized)
     label_image.config(image=photo)
@@ -68,8 +72,12 @@ ttk.Label(root, text="Wybierz obraz:").pack(pady=5)
 dropdown = ttk.Combobox(root, values=find_pictures(), state="readonly")
 dropdown.pack(pady=5)
 
+
 btn_load = ttk.Button(root, text="Pokaż obraz", command=load_image)
 btn_load.pack(pady=5)
+
+label_size = ttk.Label(root, text="Rozmiar: -")
+label_size.pack(pady=5)  # 🔧 dodane
 
 label_image = ttk.Label(root)
 label_image.pack(pady=10)
