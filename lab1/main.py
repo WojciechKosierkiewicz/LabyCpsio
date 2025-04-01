@@ -93,6 +93,10 @@ def apply_transformation():
         e = float(entry_e.get())
     except:
         e = 4.0
+    try:
+        gamma = float(entry_gamma.get())
+    except:
+        gamma = 1.0
 
     if option == "Brak":
         current_image_np = original_image_np.copy()
@@ -102,6 +106,10 @@ def apply_transformation():
         current_image_np = np.clip(c * np.log1p(r), 0, 255).astype(np.uint8)
     elif option == "Zmiana kontrastu":
         current_image_np = (255 / (1 + (m / (r + 1e-5)) ** e)).astype(np.uint8)
+    elif option == "Korekcja gamma":
+        r_norm = r / 255.0
+        corrected = c * np.power(r_norm, gamma)
+        current_image_np = np.clip(corrected * 255, 0, 255).astype(np.uint8)
 
     show_image(current_image_np)
 
@@ -142,7 +150,8 @@ transform_option = ttk.Combobox(root, state="readonly", values=[
     "Brak",
     "Mnożenie przez stałą",
     "Transformacja logarytmiczna",
-    "Zmiana kontrastu"
+    "Zmiana kontrastu",
+    "Korekcja gamma"
 ])
 transform_option.set("Brak")
 transform_option.pack(pady=5)
@@ -165,6 +174,12 @@ ttk.Label(frame_params, text="e:").grid(row=0, column=4)
 entry_e = ttk.Entry(frame_params, width=6)
 entry_e.insert(0, "4")
 entry_e.grid(row=0, column=5)
+
+ttk.Label(frame_params, text="γ:").grid(row=0, column=6)  # gamma
+entry_gamma = ttk.Entry(frame_params, width=6)
+entry_gamma.insert(0, "1.0")
+entry_gamma.grid(row=0, column=7)
+
 
 ttk.Button(root, text="Zastosuj transformację", command=apply_transformation).pack(pady=5)
 
