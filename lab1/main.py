@@ -26,6 +26,18 @@ def load_image():
     scale_col.config(to=w-1)
 
     show_image(current_image_np)
+    show_histogram(current_image_np)
+
+def show_histogram(img_array):
+    plt.figure("Histogram")
+    plt.clf()
+    plt.hist(img_array.ravel(), bins=256, range=(0, 255), color='gray')
+    plt.title("Histogram poziomów szarości")
+    plt.xlabel("Poziom szarości")
+    plt.ylabel("Liczba pikseli")
+    plt.tight_layout()
+    plt.pause(0.01)
+
 
 def show_image(img_array):
     image = Image.fromarray(img_array)
@@ -112,6 +124,7 @@ def apply_transformation():
         current_image_np = np.clip(corrected * 255, 0, 255).astype(np.uint8)
 
     show_image(current_image_np)
+    show_histogram(current_image_np)
 
 # === GUI ===
 folder_path = '/Users/wojtek/repos/LabyCpsio/lab1/obrazy'
