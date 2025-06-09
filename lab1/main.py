@@ -127,7 +127,8 @@ def apply_transformation():
     show_histogram(current_image_np)
 
 # === GUI ===
-folder_path = '/Users/wojtek/repos/LabyCpsio/lab1/obrazy'
+# folder_path = '/Users/wojtek/repos/LabyCpsio/lab1/obrazy'
+folder_path = r'C:\Users\wojte\Documents\LabyCpsio\lab1\obrazy'
 current_image_np = None
 original_image_np = None
 
