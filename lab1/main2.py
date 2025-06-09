@@ -630,10 +630,12 @@ def apply_multi_step_enhancement():
             gradient_y[i, j] = np.abs(np.sum(window * sobel_y))
     
     gradient = np.sqrt(gradient_x**2 + gradient_y**2)
-    # Adjust normalization to get brighter edges
+    # Scale up the gradient much more to match the example brightness
+    gradient = gradient * 4.0  # Increased from 1.5 to 4.0
+    # Normalize to 0-255 range with adjusted scaling
     gradient = (gradient * 255 / gradient.max()).clip(0, 255).astype(np.uint8)
-    # Apply threshold to make edges more pronounced
-    gradient[gradient < 30] = 0  # Remove weak edges
+    # Adjust threshold to match example
+    gradient[gradient < 15] = 0  # Further reduced threshold to preserve more edges
     show_step(gradient, "d) Sobel Gradient", 2, 0)
     
     # Step e: Mean filter (5x5) applied to gradient result
@@ -646,12 +648,19 @@ def apply_multi_step_enhancement():
     mean_result = mean_result.clip(0, 255).astype(np.uint8)
     show_step(mean_result, "e) Mean Filter 5x5", 2, 1)
     
-    # Step f: Final enhancement (gamma correction with adjusted parameters)
+    # Step f: Final enhancement - combine results
+    # First multiply mean filter result with Laplacian
+    combined = (mean_result.astype(float) * laplacian_result.astype(float)) / 255.0
+    # Add original image to the result
+    final_result = original.astype(float) + combined
+    
+    # Apply gamma correction to the final combination
     gamma = 0.6  # Slightly higher gamma to match example
     c = 1.2     # Slightly higher contrast
-    final_result = c * (mean_result.astype(float) / 255.0) ** gamma
+    final_result = final_result / final_result.max()  # Normalize to 0-1 range
+    final_result = c * (final_result ** gamma)
     final_result = (final_result * 255).clip(0, 255).astype(np.uint8)
-    show_step(final_result, "f) Gamma Correction", 2, 2)
+    show_step(final_result, "f) Final Result", 2, 2)
     
     # Update the main display with final result
     selected_image = final_result
