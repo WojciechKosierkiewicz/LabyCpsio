@@ -69,10 +69,10 @@ def update_profiles(*args):
     # Profil poziomy
     row = int(row_scale.get())
     if row < height:
-        plt.figure("Profil poziomy")
+        plt.figure("Szarosc pozioma")
         plt.clf()
         plt.plot(selected_image[row,:])
-        plt.title(f'Profil poziomy (wiersz {row})')
+        plt.title(f'Szarosc pozioma(wiersz {row})')
         plt.xlabel("Pozycja x")
         plt.ylabel("Poziom szarości")
         plt.grid(True)
@@ -81,10 +81,10 @@ def update_profiles(*args):
     # Profil pionowy
     col = int(col_scale.get())
     if col < width:
-        plt.figure("Profil pionowy")
+        plt.figure("Szarosc pionowa")
         plt.clf()
         plt.plot(selected_image[:,col])
-        plt.title(f'Profil pionowy (kolumna {col})')
+        plt.title(f'Szarosc pionowa(kolumna {col})')
         plt.xlabel("Pozycja y")
         plt.ylabel("Poziom szarości")
         plt.grid(True)
@@ -252,23 +252,23 @@ def histogram_equalization():
     show_profile_lines()
     
     # Show histogram comparison
-    plt.figure("Histogram Comparison")
+    plt.figure("Porównanie histogramów")
     plt.clf()
     
     # Original histogram
     plt.subplot(2, 1, 1)
     plt.hist(original_img.flatten(), bins=256, range=[0, 256], color='b', alpha=0.7)
-    plt.title("Original Histogram")
-    plt.xlabel("Pixel Value")
-    plt.ylabel("Frequency")
+    plt.title("Orginalny histogram")
+    plt.xlabel("Poziom szarości")
+    plt.ylabel("częstotliwość")
     plt.grid(True)
     
     # Equalized histogram
     plt.subplot(2, 1, 2)
     plt.hist(selected_image.flatten(), bins=256, range=[0, 256], color='g', alpha=0.7)
-    plt.title("Equalized Histogram")
-    plt.xlabel("Pixel Value")
-    plt.ylabel("Frequency")
+    plt.title("Wyrównany histogram")
+    plt.xlabel("Poziom szarości")
+    plt.ylabel("częstotliwość")
     plt.grid(True)
     
     plt.tight_layout()
